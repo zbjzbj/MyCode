@@ -22,6 +22,7 @@ conn = create_engine(
 
 Base = declarative_base()
 
+
 class Book(Base):
     __tablename__ = 'book'
 
@@ -38,12 +39,18 @@ class Book(Base):
         Index("id", "title")
     )
 
+    def __repr__(self):
+        return self.title
+
 
 class Publisher(Base):
     __tablename__ = 'publisher'
 
     id = Column(Integer, primary_key=True)
     title = Column(String(64), nullable=False)
+
+    def __repr__(self):
+        return self.title
 
 
 class Tag(Base):
@@ -101,12 +108,17 @@ if __name__ == '__main__':
     # print(ret2)
 
     # session.query(Tag).filter_by(id=2).update({"title": 'golang'})
-    tag_obj = Tag(title='heihei2')
+    # tag_obj = Tag(title='heihei2')
     # tag_obj.books = [Book(title='时间简史'), Book(title='吃屎')]
-    tag_obj.books = [session.query(Book).filter_by(id=1).first()]
-    session.add(tag_obj)
-    session.commit()
+    # tag_obj.books = [session.query(Book).filter_by(id=1).first()]
+    # session.add(tag_obj)
+    # session.commit()
 
+    # ret = session.query(Book, Publisher).filter(Book.publisher_id==Publisher.id).all()
+    # ret = session.query(Book).join(Publisher).all()
+    # ret = session.query(Book).join(Publisher, isouter=True).all()
+    ret = session.query(Book).outerjoin(Publisher).all()
+    print(ret)
 
 
 
