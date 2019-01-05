@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>投票系统</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+    <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.js"></script>
+</head>
+<style>
+    .my-li {
+        list-style: none;
+        margin-bottom: 20px;
+        font-size: 18px;
+    }
+</style>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <h1>LPL第一打野投票</h1>
+            {% for (uid, user) in users.items() %}
+                <button class="btn btn-success" onclick="vote({{ uid }})">投票</button>
+                <li class="list-group-item-info my-li" id="{{ uid }}">{{ user.name }}目前的票数是: {{ user.count }}</li>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // 投票
+    function vote(uid) {
+        // 向后端发送投票请求
+        axios.request({
+            url: '/vote',
+            method: 'post',
+            data: {
+                uid: uid
+            }
+        }).then(function (response) {
+            console.log(response.data);
+        })
+    }
+
+    // 获取最新的投票结果
+    function get_vote() {
+        axios.request({
+            url: '/get_vote',
+            method: 'get'
+        }).then(function (response) {
+            // 获取后端传过来的新数据
+            // 重新渲染页面
+            let users = response.data;
+            for (let uid in users) {
+                //根据uid获取li标签 改变innerText
+                let liEle = document.getElementById(uid);
+                liEle.innerText = `${users[uid]['name']}目前的票数是: ${users[uid]['count']}`
+            }
+        });
+    }
+
+    // 页面加载完后，立刻获取数据
+    window.onload = function () {
+        setInterval(get_vote, 2000)
+    }
+
+</script>
+
+</body>
+</html>
